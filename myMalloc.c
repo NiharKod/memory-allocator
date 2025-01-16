@@ -32,7 +32,7 @@ header freelistSentinels[N_LISTS];
 header * lastFencePost;
 
 /*
- * Pointer to maintian the base of the heap to allow printing based on the
+ * Pointer to maintain the base of the heap to allow printing based on the
  * distance from the base of the heap
  */ 
 void * base;
