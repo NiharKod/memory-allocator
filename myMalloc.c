@@ -239,7 +239,7 @@ static inline header * allocate_object(size_t raw_size) {
           current->prev = NULL;
           current->next = NULL;
           
-          return (header *) current; 
+          return (header *)((char *) current + ALLOC_HEADER_SIZE);
         } else {
           /* We need to split the block, allocate the right side */
           size_t remainder = get_size(current) - actual_size; 
@@ -267,7 +267,7 @@ static inline header * allocate_object(size_t raw_size) {
           current->prev = new_sentinal;
           next->prev = current;
           
-          return (header *) current;
+          return (header *)((char *) current + ALLOC_HEADER_SIZE);
         } 
       }
   }
