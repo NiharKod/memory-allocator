@@ -228,7 +228,7 @@ static inline header * allocate_object(size_t raw_size) {
          * the block is simply removed from the free list.
          */
 
-        if (get_size(current) == actual_size || ((get_size(current) > actual_size) && (get_size(current) - actual_size < sizeof(header))))  {
+        if (get_size(current) == actual_size || ((get_size(current) > actual_size) && (get_size(current) - actual_size <= ALLOC_HEADER_SIZE)))  {
           /* Set state to allocated */
           set_state(current, ALLOCATED);
           
