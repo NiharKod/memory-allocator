@@ -245,17 +245,26 @@ static inline header * allocate_object(size_t raw_size) {
           size_t remainder = get_size(current) - actual_size; 
           /* Create header at the allocation location */
           header * split = get_header_from_offset(current, (ptrdiff_t)remainder);
-          set_size(split, rounded_size);
+
+          set_size(split, actual_size);
 
           set_state(split, ALLOCATED);
+          /* set the left of the alloc block */
+          split->left_size = get_left_header(split)->left_size;
 
-          /* We must update the size of the partition now */
+          header *right = get_right_header(split);
+
+          if (get_state(right) != FENCEPOST) {
+              right->left_size = get_size(split);
+          }
+
+          /* We must update the size of the remainder now */
           set_size(current, remainder);
           /*
            * When splitting a block, if the size of the remaining block is no longer appropriate for the current list, 
            * the remainder block should be removed and inserted into the appropriate free list.
            */
-          
+         
           /* Check if we need to move the remainder or not */
           if ((get_size(current) - ALLOC_HEADER_SIZE / 8) - 1 < N_LISTS - 1) {
             /* Remove the node */
