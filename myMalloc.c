@@ -250,7 +250,7 @@ static inline header * allocate_object(size_t raw_size) {
 
           set_state(split, ALLOCATED);
           /* set the left of the alloc block */
-          split->left_size = get_left_header(split)->left_size;
+          split->left_size = get_size(get_left_header(split));
 
           header *right = get_right_header(split);
 
