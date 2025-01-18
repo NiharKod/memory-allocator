@@ -260,13 +260,13 @@ static inline header * allocate_object(size_t raw_size) {
           current->next->prev = current->prev;
 
           /* Reconnect the node to the proper list */
-          header * new_sentinal = &freelistSentinels[((get_size(split) - ALLOC_HEADER_SIZE) / 8) - 1];
-
-          header *next_header = new_sentinal->next;
-          new_sentinal->next = split; 
-          split->prev = new_sentinal;
-          split->next = next_header;
-          next_header->prev = split;
+          header * new_sentinal = &freelistSentinels[((remainder - ALLOC_HEADER_SIZE) / 8) - 1];
+          header *next = new_sentinal->next; 
+          new_sentinal->next = current;
+          current->next = next;
+          current->prev = new_sentinal;
+          next->prev = current;
+          
           return (header *) current;
         } 
       }
