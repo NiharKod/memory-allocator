@@ -249,25 +249,30 @@ static inline header * allocate_object(size_t raw_size) {
 
           set_state(split, ALLOCATED);
 
+          /* We must update the size of the partition now */
+          set_size(current, remainder);
           /*
            * When splitting a block, if the size of the remaining block is no longer appropriate for the current list, 
            * the remainder block should be removed and inserted into the appropriate free list.
            */
           
-          /* First disconnect the node */
+          /* Check if we need to move the remainder or not */
+          if ((get_size(current) - ALLOC_HEADER_SIZE / 8) - 1 < N_LISTS - 1) {
+            /* Remove the node */
+            current->prev->next = current->next;
+            current->next->prev = current->prev;
+            /* Create new sentinal */
+            header * new_sentinal = &freelistSentinels[((get_size(current) - ALLOC_HEADER_SIZE) / 8) - 1];
 
-          current->prev->next = current->next;
-          current->next->prev = current->prev;
-
-          /* Reconnect the node to the proper list */
-          header * new_sentinal = &freelistSentinels[((remainder - ALLOC_HEADER_SIZE) / 8) - 1];
-          header *next = new_sentinal->next; 
-          new_sentinal->next = current;
-          current->next = next;
-          current->prev = new_sentinal;
-          next->prev = current;
-          
-          return (header *)((char *) current + ALLOC_HEADER_SIZE);
+            /* Prepend */
+            header *next = new_sentinal->next; 
+            new_sentinal->next = current;
+            current->next = next;
+            current->prev = new_sentinal;
+            next->prev = current;
+          } 
+                    
+          return (header *)((char *) split + ALLOC_HEADER_SIZE);
         } 
       }
   }
