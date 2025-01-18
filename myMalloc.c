@@ -254,9 +254,8 @@ static inline header * allocate_object(size_t raw_size) {
 
           header *right = get_right_header(split);
 
-          if (get_state(right) != FENCEPOST) {
-              right->left_size = get_size(split);
-          }
+          right->left_size = get_size(split);
+          
 
           /* We must update the size of the remainder now */
           set_size(current, remainder);
