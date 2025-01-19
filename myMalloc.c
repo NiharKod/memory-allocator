@@ -192,6 +192,32 @@ static header * allocate_chunk(size_t size) {
  *
  * @return A block satisfying the user's request
  */
+
+
+static inline header *allocate_object_new(size_t raw_size) {
+  /* An allocation of 0 bytes should return the NULL pointer for determinism */
+  if (raw_size == 0) {
+    return NULL;
+  }
+
+   /*
+   * Calculate the actual size needed 
+   */
+
+  size_t rounded_size = (raw_size + 7) & ~7;
+  size_t actual_size = ALLOC_HEADER_SIZE + rounded_size;
+  actual_size = actual_size > sizeof(header) ? actual_size : sizeof(header);
+
+  /*
+   * Find the appropriate free list to look for a block to allocate 
+   * (recall that the block size per each list is based on the rounded 
+   * request size, not including the metadata) size of the head
+   */
+
+   int i = find_sentinal_index(actual_size);
+
+}
+
 static inline header * allocate_object(size_t raw_size) { 
   /* An allocation of 0 bytes should return the NULL pointer for determinism */
 
@@ -238,17 +264,7 @@ static inline header * allocate_object(size_t raw_size) {
         if (get_size(current) == actual_size || ((get_size(current) > actual_size) && (get_size(current) - actual_size <= ALLOC_HEADER_SIZE)))  {
           /* Set state to allocated */
           set_state(current, ALLOCATED);
-          
-          /* Disconnect the adjacent nodes 
-          current->prev->next = current->next;
-          current->next->prev = current->prev;
-          Disconnect current node 
-          current->prev = NULL;
-          current->next = NULL;
-          */
-
           remove_block(current);
-          
           return (header *)((char *) current + ALLOC_HEADER_SIZE);
         } else {
           /* We need to split the block, allocate the right side */
@@ -306,6 +322,12 @@ static inline int get_index_from_actual_size(size_t actual_size) {
 }
 
 
+
+static inline void prepend_block(header *header_block) {
+
+
+}
+
 static inline void remove_block(header * header_block) {
   /* Disconnect the adjacent nodes */
    header_block->prev->next = header_block->next;
@@ -321,12 +343,12 @@ static inline int find_sentinal_index(size_t actual_size) {
   /* Start from the index we predict and cycle through till we have non empty list */
   for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
       header* free_list = &freelistSentinels[i];
-
       if (free_list->next == free_list && free_list->prev == free_list) {
         continue;
       }
+      /* Return early if we reach the end */
       if (i == N_LISTS - 1) {
-        
+       return i 
       }
       return i;
   } 
