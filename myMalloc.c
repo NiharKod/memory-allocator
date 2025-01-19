@@ -303,6 +303,24 @@ static inline header * allocate_object(size_t raw_size) {
 
 }
 
+
+
+static inline int find_sentinal_index(size_t actual_size) {
+
+  /* Start from the index we predict and cycle through till we have non empty list */
+
+  for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
+      header* free_list = &freelistSentinels[i];
+
+      if (free_list->next == free_list && free_list->prev == free_list) {
+        continue;
+      }
+      if (i == N_LISTS - 1) {
+        
+      }
+      return i;
+  } 
+}
 /**
  * @brief Helper to get the header from a pointer allocated with malloc
  *
