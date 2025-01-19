@@ -338,7 +338,22 @@ static inline void remove_block(header * header_block) {
 }
 
 
-static inline int find_sentinal_index(size_t actual_size) {
+static inline header* search_block(int index, size_t actual_size) {
+  if (index >= N_LISTS - 1) {
+     header* current = free_list;
+       while (get_size(current) < actual_size) {
+         current = current->next;
+       }
+       /* Returns current once found */
+      return current;
+  } else {
+    return freelistSentinels[index]->next;
+  }
+
+  /* need to consider create new chunk */
+}
+
+static inline header* find_block(size_t actual_size) {
 
   /* Start from the index we predict and cycle through till we have non empty list */
   for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
