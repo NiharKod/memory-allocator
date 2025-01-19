@@ -78,6 +78,9 @@ static void init();
 
 static bool isMallocInitialized;
 
+
+static inline int get_index_from_actual_size(size_t actual_size);
+
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
  *        offset
@@ -178,6 +181,19 @@ static header * allocate_chunk(size_t size) {
   return hdr;
 }
 
+
+
+/*
+ * Find index given total size
+ */
+
+static inline int get_index_from_actual_size(size_t actual_size) {
+  return ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1;
+}
+
+
+
+
 /**
  * @brief Helper allocate an object given a raw request size from the user
  *
@@ -206,7 +222,7 @@ static inline header * allocate_object(size_t raw_size) {
    * request size, not including the metadata) size of the head
    */
 
-  for (int i = ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1; i <= N_LISTS - 1; i++) {
+  for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
       /* Skip empty lists */
 
       header* free_list = &freelistSentinels[i];
