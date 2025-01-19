@@ -185,15 +185,6 @@ static header * allocate_chunk(size_t size) {
 }
 
 
-
-/*
- * Find index given total size
- */
-
-static inline int get_index_from_actual_size(size_t actual_size) {
-  return ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1;
-}
-
 /**
  * @brief Helper allocate an object given a raw request size from the user
  *
@@ -306,6 +297,15 @@ static inline header * allocate_object(size_t raw_size) {
 
 }
 
+/*
+ * Find index given total size
+ */
+
+static inline int get_index_from_actual_size(size_t actual_size) {
+  return ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1;
+}
+
+
 static inline void remove_block(header * header_block) {
   /* Disconnect the adjacent nodes */
    header_block->prev->next = header_block->next;
@@ -319,7 +319,6 @@ static inline void remove_block(header * header_block) {
 static inline int find_sentinal_index(size_t actual_size) {
 
   /* Start from the index we predict and cycle through till we have non empty list */
-
   for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
       header* free_list = &freelistSentinels[i];
 
