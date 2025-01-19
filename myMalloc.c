@@ -309,7 +309,7 @@ static inline header * allocate_object(size_t raw_size) {
 static inline void remove_block(header * header_block) {
   /* Disconnect the adjacent nodes */
    header_block->prev->next = header_block->next;
-   header_blok->next->prev = header_block->prev;
+   header_block->next->prev = header_block->prev;
   /* Disconnect current node */
    header_block->prev = NULL;
    header_block->next = NULL;
