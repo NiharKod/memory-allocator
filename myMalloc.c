@@ -191,9 +191,6 @@ static inline int get_index_from_actual_size(size_t actual_size) {
   return ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1;
 }
 
-
-
-
 /**
  * @brief Helper allocate an object given a raw request size from the user
  *
@@ -305,7 +302,7 @@ static inline header * allocate_object(size_t raw_size) {
 
 
 
-static inline int find_sentinal_index(size_t actual_size) {
+fdshjfhjkshkj static inline int find_sentinal_index(size_t actual_size) {
 
   /* Start from the index we predict and cycle through till we have non empty list */
 
