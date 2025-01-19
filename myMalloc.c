@@ -348,7 +348,7 @@ static inline int find_sentinal_index(size_t actual_size) {
       }
       /* Return early if we reach the end */
       if (i == N_LISTS - 1) {
-       return i 
+       return i; 
       }
       return i;
   } 
