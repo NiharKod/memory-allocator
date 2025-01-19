@@ -214,7 +214,7 @@ static inline header *allocate_object_new(size_t raw_size) {
    * request size, not including the metadata) size of the head
    */
 
-   int i = find_sentinal_index(actual_size);
+   header* block = find_sentinal_index(actual_size);
 
 }
 
