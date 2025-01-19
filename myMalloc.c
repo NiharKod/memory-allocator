@@ -78,8 +78,11 @@ static void init();
 
 static bool isMallocInitialized;
 
-
+/* Custom helpers */
+static inline void remove_block(header * header_block);
 static inline int get_index_from_actual_size(size_t actual_size);
+static inline int find_sentinal_index(size_t actual_size);
+
 
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
@@ -245,12 +248,15 @@ static inline header * allocate_object(size_t raw_size) {
           /* Set state to allocated */
           set_state(current, ALLOCATED);
           
-          /* Disconnect the adjacent nodes */
+          /* Disconnect the adjacent nodes 
           current->prev->next = current->next;
           current->next->prev = current->prev;
-          /* Disconnect current node */
+          Disconnect current node 
           current->prev = NULL;
           current->next = NULL;
+          */
+
+          remove_block(current);
           
           return (header *)((char *) current + ALLOC_HEADER_SIZE);
         } else {
@@ -300,9 +306,17 @@ static inline header * allocate_object(size_t raw_size) {
 
 }
 
+static inline void remove_block(header * header_block) {
+  /* Disconnect the adjacent nodes */
+   header_block->prev->next = header_block->next;
+   header_blok->next->prev = header_block->prev;
+  /* Disconnect current node */
+   header_block->prev = NULL;
+   header_block->next = NULL;
+}
 
 
-fdshjfhjkshkj static inline int find_sentinal_index(size_t actual_size) {
+static inline int find_sentinal_index(size_t actual_size) {
 
   /* Start from the index we predict and cycle through till we have non empty list */
 
