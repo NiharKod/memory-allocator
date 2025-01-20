@@ -80,6 +80,9 @@ static bool isMallocInitialized;
 
 /* Custom helpers */
 static inline void remove_block(header * header_block);
+static inline void prepend_block(int i, header *header_block);
+static inline header* search_block(int index, size_t actual_size);
+static inline header* find_block(size_t actual_size);
 static inline int get_index_from_actual_size(size_t actual_size);
 static inline int find_sentinal_index(size_t actual_size);
 
@@ -214,8 +217,51 @@ static inline header *allocate_object_new(size_t raw_size) {
    * request size, not including the metadata) size of the head
    */
 
-   header* block = find_sentinal_index(actual_size);
+  /*
+   * Find the block to allocate provided actual_size 
+   */
 
+   header* block = search_block(actual_size);
+
+   /* Case: Don't need to split and just return block directly */
+    if (get_size(block) == actual_size || ((get_size(block) > actual_size) && (get_size(block) - actual_size <= ALLOC_HEADER_SIZE)))  {
+       /* Set state to allocated */
+       set_state(block, ALLOCATED);
+       remove_block(block);
+       return (header *)((char *) block + ALLOC_HEADER_SIZE);
+    } else {
+          /* We need to split the block, allocate the right side */
+          size_t remainder = get_size(block) - actual_size; 
+          /* Create header at the allocation location */
+          header * split = get_header_from_offset(block, (ptrdiff_t)remainder);
+
+          set_size(split, actual_size);
+
+          set_state(split, ALLOCATED);
+          /* set the left of the alloc block */
+          split->left_size = remainder;
+
+          header *right = get_right_header(split);
+
+          right->left_size = get_size(split);
+
+          /* We must update the size of the remainder now */
+          set_size(block, remainder);
+
+          /*
+           * When splitting a block, if the size of the remaining block is no longer appropriate for the current list, 
+           * the remainder block should be removed and inserted into the appropriate free list.
+           */
+         
+          /* Check if we need to move the remainder or not */
+          if ((get_size(current) - ALLOC_HEADER_SIZE / 8) - 1 < N_LISTS - 1) {
+
+            remove_block(block);
+            prepend_block(get_index_from_actual_size(actual_size), block));
+          } 
+                    
+          return (header *)((char *) split + ALLOC_HEADER_SIZE);
+        } 
 }
 
 static inline header * allocate_object(size_t raw_size) { 
@@ -323,9 +369,14 @@ static inline int get_index_from_actual_size(size_t actual_size) {
 
 
 
-static inline void prepend_block(header *header_block) {
+static inline void prepend_block(int i, header *header_block) {
+   header *sentinal = &freelistSentinels[i];
+   header *next = sentinal->next;
 
-
+   sentinal->next = header_block;
+   header_block->previous = sentinal;
+   next->prev = header_block;
+   header_block->next = prev;
 }
 
 static inline void remove_block(header * header_block) {
@@ -340,34 +391,29 @@ static inline void remove_block(header * header_block) {
 
 static inline header* search_block(int index, size_t actual_size) {
   if (index >= N_LISTS - 1) {
-     header* current = freelistSentinels[i];
+     header* current = &freelistSentinels[i];
        while (get_size(current) < actual_size) {
          current = current->next;
        }
        /* Returns current once found */
       return current;
   } else {
-    return freelistSentinels[index]->next;
+    return (&freelistSentinels[index])->next;
   }
-
   /* need to consider create new chunk */
 }
 
 static inline header* find_block(size_t actual_size) {
-
   /* Start from the index we predict and cycle through till we have non empty list */
   for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
-      header* free_list = &freelistSentinels[i];
-      if (free_list->next == free_list && free_list->prev == free_list) {
-        continue;
-      }
-      /* Return early if we reach the end */
-      if (i == N_LISTS - 1) {
-       return i; 
-      }
-      return i;
+    header *block = search_block(i, actual_size);
+    if (block != block->next){
+      return block;
+    }
   } 
 }
+
+
 /**
  * @brief Helper to get the header from a pointer allocated with malloc
  *
