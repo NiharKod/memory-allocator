@@ -257,7 +257,7 @@ static inline header *allocate_object_new(size_t raw_size) {
           if (get_index_from_actual_size(actual_size) < N_LISTS - 1) {
 
             remove_block(block);
-            prepend_block(get_index_from_actual_size(actual_size), block));
+            prepend_block(get_index_from_actual_size(actual_size), block);
           } 
                     
           return (header *)((char *) split + ALLOC_HEADER_SIZE);
