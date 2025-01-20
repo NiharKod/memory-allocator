@@ -226,8 +226,8 @@ static inline header *allocate_object(size_t raw_size) {
    /* Case: Don't need to split and just return block directly */
     if (get_size(block) == actual_size || ((get_size(block) > actual_size) && (get_size(block) - actual_size <= ALLOC_HEADER_SIZE)))  {
        /* Set state to allocated */
-       set_state(block, ALLOCATED);
        remove_block(block);
+       set_state(block, ALLOCATED);
        return (header *)((char *) block + ALLOC_HEADER_SIZE);
     } else {
           /* We need to split the block, allocate the right side */
