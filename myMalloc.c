@@ -221,7 +221,7 @@ static inline header *allocate_object_new(size_t raw_size) {
    * Find the block to allocate provided actual_size 
    */
 
-   header* block = search_block(actual_size);
+   header* block = find_block(actual_size);
 
    /* Case: Don't need to split and just return block directly */
     if (get_size(block) == actual_size || ((get_size(block) > actual_size) && (get_size(block) - actual_size <= ALLOC_HEADER_SIZE)))  {
