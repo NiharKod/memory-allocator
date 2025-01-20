@@ -374,7 +374,7 @@ static inline void prepend_block(int i, header *header_block) {
    header *next = sentinal->next;
 
    sentinal->next = header_block;
-   header_block->previous = sentinal;
+   header_block->prev = sentinal;
    next->prev = header_block;
    header_block->next = prev;
 }
