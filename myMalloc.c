@@ -363,7 +363,7 @@ static inline header * allocate_object_old(size_t raw_size) {
  */
 
 static inline int get_index_from_actual_size(size_t actual_size) {
-  return ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 > N_LISTS - 1 ? ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 : N_LISTS - 1;
+  return ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 <= N_LISTS - 1 ? ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 : N_LISTS - 1;
 }
 
 
