@@ -376,7 +376,7 @@ static inline void prepend_block(int i, header *header_block) {
    sentinal->next = header_block;
    header_block->prev = sentinal;
    next->prev = header_block;
-   header_block->next = prev;
+   header_block->next = next;
 }
 
 static inline void remove_block(header * header_block) {
