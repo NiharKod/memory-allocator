@@ -197,7 +197,7 @@ static header * allocate_chunk(size_t size) {
  */
 
 
-static inline header *allocate_object_new(size_t raw_size) {
+static inline header *allocate_object(size_t raw_size) {
   /* An allocation of 0 bytes should return the NULL pointer for determinism */
   if (raw_size == 0) {
     return NULL;
@@ -264,7 +264,7 @@ static inline header *allocate_object_new(size_t raw_size) {
         } 
 }
 
-static inline header * allocate_object(size_t raw_size) { 
+static inline header * allocate_object_old(size_t raw_size) { 
   /* An allocation of 0 bytes should return the NULL pointer for determinism */
 
   if (raw_size == 0) {
