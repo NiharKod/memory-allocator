@@ -254,7 +254,7 @@ static inline header *allocate_object_new(size_t raw_size) {
            */
          
           /* Check if we need to move the remainder or not */
-          if ((get_size(current) - ALLOC_HEADER_SIZE / 8) - 1 < N_LISTS - 1) {
+          if (get_index_from_actual_size(actual_size) < N_LISTS - 1) {
 
             remove_block(block);
             prepend_block(get_index_from_actual_size(actual_size), block));
