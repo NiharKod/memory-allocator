@@ -391,7 +391,7 @@ static inline void remove_block(header * header_block) {
 
 static inline header* search_block(int index, size_t actual_size) {
   if (index >= N_LISTS - 1) {
-     header* current = &freelistSentinels[i];
+     header* current = &freelistSentinels[index];
        while (get_size(current) < actual_size) {
          current = current->next;
        }
