@@ -441,6 +441,9 @@ static inline header * ptr_to_header(void * p) {
  */
 static inline void deallocate_object(void * p) {
   // TODO implement deallocation
+  if (p == NULL) {
+    return;
+  }
   header * block = ptr_to_header(p);
   int actual_size = get_size(block);
 
