@@ -263,6 +263,7 @@ static inline header *allocate_object(size_t raw_size) {
         } 
 }
 
+
 static inline header * allocate_object_old(size_t raw_size) { 
   /* An allocation of 0 bytes should return the NULL pointer for determinism */
 
@@ -412,6 +413,15 @@ static inline header* find_block(size_t actual_size) {
   } 
 }
 
+static inline void combine_inplace(header *a, header *b) {
+  header *b_next = b->next;
+  b_next->prev = a;
+  a->next = b_next;
+  header *b_prev = b->prev;
+  b_prev->next = a;
+  a->prev = b_prev;
+}
+
 
 /**
  * @brief Helper to get the header from a pointer allocated with malloc
@@ -431,9 +441,58 @@ static inline header * ptr_to_header(void * p) {
  */
 static inline void deallocate_object(void * p) {
   // TODO implement deallocation
-  (void) p;
-  assert(false);
-  exit(1);
+  header * block = ptr_to_header(p);
+  int actual_size = get_size(block);
+
+  if (get_state(block) == UNALLOCATED) {
+    return;
+  }
+
+
+  header *left_block = get_left_header(block);
+  header *right_block = get_right_header(block);
+
+  /* Neither right or left are unallocated */
+  int index = get_index_from_actual_size(actual_size);
+
+  if (get_state(left_block) == ALLOCATED && get_state(right_block) == ALLOCATED) {
+      set_state(block, UNALLOCATED);
+      prepend_block(index, block);
+
+  } else if (get_state(left_block) == UNALLOCATED && get_state(right_block) == UNALLOCATED) {
+      /* Combine all three blocks together. */
+    size_t new_size = get_size(left_block) + actual_size + get_size(right_block);
+    set_size(left_block, new_size);
+    get_right_header(right_block)->left_size = new_size;
+
+    int index_new = get_index_from_actual_size(new_size);
+
+  } else if (get_state(right_block) == UNALLOCATED) {
+      size_t new_size = actual_size + get_size(right_block);
+      /* Update the size */
+      set_state(block, unallocated);
+      set_size(block, new_size);
+      header *right_right = get_right_header(right_block);
+      right_right->left_size = new_size;
+
+      /* Move it into the correct list if needed */
+      int index_new = get_index_from_actual_size(new_size);
+
+      if (index_new == index) {
+        combine_inplace(block, right_block);
+      } else {
+        prepend_block(index_new, block);
+      }
+  } else if (get_state(left_block) == UNALLOCATED) {
+
+
+
+  }
+
+
+  
+
+
 }
 
 /**
