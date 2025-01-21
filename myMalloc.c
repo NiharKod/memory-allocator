@@ -363,13 +363,13 @@ static inline header * allocate_object_old(size_t raw_size) {
  * Find index given total size
  */
 
-static inline int get_index_from_actual_size(size_t actual_size) {
-  return ((actual_size - ALLOC_HEADER_SIZE ) / 8) -1 <= N_LISTS - 1 ? ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 : N_LISTS - 1;
+static inline size_t get_index_from_actual_size(size_t actual_size) {
+  return ((actual_size - ALLOC_HEADER_SIZE ) / 8) - 1 <= N_LISTS - 1 ? ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 : N_LISTS - 1;
 }
 
 
 
-static inline void prepend_block(int i, header *header_block) {
+static inline void prepend_block(size_t i, header *header_block) {
    header *sentinal = &freelistSentinels[i];
    header *next = sentinal->next;
 
@@ -389,7 +389,7 @@ static inline void remove_block(header * header_block) {
 }
 
 
-static inline header* search_block(int index, size_t actual_size) {
+static inline header* search_block(size_t index, size_t actual_size) {
   if (index >= N_LISTS - 1) {
      header* current = &freelistSentinels[index];
        while (get_size(current) < actual_size) {
