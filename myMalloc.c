@@ -364,7 +364,7 @@ static inline header * allocate_object_old(size_t raw_size) {
  */
 
 static inline int get_index_from_actual_size(size_t actual_size) {
-  return ((actual_size - ALLOC_HEADER_SIZE - 1) / 8)  <= N_LISTS - 1 ? ((actual_size - ALLOC_HEADER_SIZE - 1) / 8) : N_LISTS - 1;
+  return ((actual_size - ALLOC_HEADER_SIZE ) / 8) -1 <= N_LISTS - 1 ? ((actual_size - ALLOC_HEADER_SIZE) / 8) - 1 : N_LISTS - 1;
 }
 
 
@@ -445,7 +445,7 @@ static inline void deallocate_object(void * p) {
     return;
   }
   header * block = ptr_to_header(p);
-  int actual_size = get_size(block);
+  size_t actual_size = get_size(block);
 
   if (get_state(block) == UNALLOCATED) {
     return;
@@ -455,11 +455,11 @@ static inline void deallocate_object(void * p) {
   header *left_block = get_left_header(block);
   header *right_block = get_right_header(block);
 
-  int right_index = get_index_from_actual_size(right_block);
-  int left_index = get_index_from_actual_size(left_block);
+  size_t right_index = get_index_from_actual_size(right_block);
+  size_t left_index = get_index_from_actual_size(left_block);
 
   /* Neither right or left are unallocated */
-  int index = get_index_from_actual_size(actual_size);
+  size_t index = get_index_from_actual_size(actual_size);
 
  
   if (get_state(left_block) == UNALLOCATED && get_state(right_block) == UNALLOCATED) {
@@ -470,7 +470,7 @@ static inline void deallocate_object(void * p) {
     get_right_header(right_block)->left_size = new_size;
  
 
-    int index_new = get_index_from_actual_size(new_size);
+    size_t index_new = get_index_from_actual_size(new_size);
     remove_block(right_block);
     if (left_index != N_LISTS - 1) {
       remove_block(left_block);
@@ -490,7 +490,7 @@ static inline void deallocate_object(void * p) {
       block->next = right_block->next;
       block->prev = right_block->prev;
 
-      int index_new = get_index_from_actual_size(new_size);
+      size_t index_new = get_index_from_actual_size(new_size);
 
       if (right_index != N_LISTS - 1 ) {
         remove_block(block);
@@ -501,7 +501,7 @@ static inline void deallocate_object(void * p) {
     size_t new_size = get_size(left_block) + actual_size;
 
     set_size(left_block, new_size);
-    int index_new = get_index_from_actual_size(new_size);
+    size_t index_new = get_index_from_actual_size(new_size);
     if (left_index != N_LISTS - 1) {
       remove_block(left_block);
       prepend_block(index_new, block);
