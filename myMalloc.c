@@ -80,8 +80,8 @@ static bool isMallocInitialized;
 
 /* Custom helpers */
 static inline void remove_block(header * header_block);
-static inline void prepend_block(int i, header *header_block);
-static inline header* search_block(int index, size_t actual_size);
+static inline void prepend_block(size_t i, header *header_block);
+static inline header* search_block(size_t index, size_t actual_size);
 static inline header* find_block(size_t actual_size);
 static inline size_t get_index_from_actual_size(size_t actual_size);
 static inline size_t find_sentinal_index(size_t actual_size);
