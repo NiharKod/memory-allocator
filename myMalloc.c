@@ -481,7 +481,7 @@ static inline void deallocate_object(void * p) {
       block->prev = right_block->prev;
       if (get_index_from_actual_size(new_size) != N_LISTS - 1) {
         remove_block(right_block);
-        prepend_block(index_new, block);
+        prepend_block(get_index_from_actual_size(new_size), block);
       } 
   
   } else if (get_state(left_block) == UNALLOCATED) {
