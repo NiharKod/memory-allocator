@@ -455,8 +455,8 @@ static inline void deallocate_object(void * p) {
   header *left_block = get_left_header(block);
   header *right_block = get_right_header(block);
 
-  size_t right_index = get_index_from_actual_size(right_block);
-  size_t left_index = get_index_from_actual_size(left_block);
+  size_t right_index = get_index_from_actual_size(get_size(right_block));
+  size_t left_index = get_index_from_actual_size(get_size(left_block));
 
   /* Neither right or left are unallocated */
   size_t index = get_index_from_actual_size(actual_size);
