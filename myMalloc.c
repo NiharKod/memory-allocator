@@ -475,10 +475,10 @@ static inline void deallocate_object(void * p) {
       header *right_right = get_right_header(right_block);
       right_right->left_size = new_size;
       
-      right->next->prev = block;
-      right->prev->next = block;
-      block->next = right->next;
-      block->prev = right->prev;
+      right_block->next->prev = block;
+      right_block->prev->next = block;
+      block->next = right_block->next;
+      block->prev = right_block->prev;
       if (get_index_from_actual_size(new_size) != N_LISTS - 1) {
         remove_block(right_block);
         prepend_block(index_new, block);
