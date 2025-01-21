@@ -474,11 +474,15 @@ static inline void deallocate_object(void * p) {
       set_size(block, new_size);
       header *right_right = get_right_header(right_block);
       right_right->left_size = new_size;
-
-      /* Move it into the correct list if needed */
-      int index_new = get_index_from_actual_size(new_size);
-      remove_block(right_block);
-      prepend_block(index_new, block);
+      
+      right->next->prev = block;
+      right->prev->next = block;
+      block->next = right->next;
+      block->prev = right->prev;
+      if (get_index_from_actual_size(new_size) != N_LISTS - 1) {
+        remove_block(right_block);
+        prepend_block(index_new, block);
+      } 
   
   } else if (get_state(left_block) == UNALLOCATED) {
 
