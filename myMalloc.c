@@ -506,8 +506,6 @@ static inline void deallocate_object(void * p) {
       remove_block(left_block);
       prepend_block(index_new, block);
     }
-    
-
   } else {
       set_state(block, UNALLOCATED);
       prepend_block(index, block);
