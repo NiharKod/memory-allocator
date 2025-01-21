@@ -501,11 +501,11 @@ static inline void deallocate_object(void * p) {
     size_t new_size = get_size(left_block) + actual_size;
 
     set_size(left_block, new_size);
-    get_right_header(right_block)->left_size = new_size;
+    right_block->left_size = new_size;
     size_t index_new = get_index_from_actual_size(new_size);
     if (left_index != N_LISTS - 1) {
       remove_block(left_block);
-      prepend_block(index_new, block);
+      prepend_block(index_new, left_block);
     }
   } else {
       set_state(block, UNALLOCATED);
