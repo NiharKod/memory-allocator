@@ -461,6 +461,7 @@ static inline void deallocate_object(void * p) {
  
   if (get_state(left_block) == UNALLOCATED && get_state(right_block) == UNALLOCATED) {
     /* Combine all three blocks together. */
+    set_state(block, UNALLOCATED);
     size_t new_size = get_size(left_block) + actual_size + get_size(right_block);
     set_size(left_block, new_size);
     get_right_header(right_block)->left_size = new_size;
@@ -494,16 +495,20 @@ static inline void deallocate_object(void * p) {
       } 
   
   } else if (get_state(left_block) == UNALLOCATED) {
+    size_t new_size = get_size(left_block) + actual_size;
 
-
+    set_size(left_block, new_size);
+    int index_new = get_index_from_actual_size(new_size);
+    if (left_index != N_LISTS - 1) {
+      remove_block(left_block);
+      prepend_block(index_new, block);
+    }
+    
 
   } else {
       set_state(block, UNALLOCATED);
       prepend_block(index, block);
   }
-
-
-  
 
 
 }
