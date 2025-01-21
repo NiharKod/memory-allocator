@@ -478,11 +478,8 @@ static inline void deallocate_object(void * p) {
       /* Move it into the correct list if needed */
       int index_new = get_index_from_actual_size(new_size);
 
-      if (index_new == index) {
-        combine_inplace(block, right_block);
-      } else {
         prepend_block(index_new, block);
-      }
+  
   } else if (get_state(left_block) == UNALLOCATED) {
 
 
