@@ -257,6 +257,7 @@ static inline header *allocate_object(size_t raw_size) {
         prepend_block(N_LISTS - 1, new_chunk);
 
      }
+
       block = find_block(actual_size);
    }
 
@@ -300,101 +301,6 @@ static inline header *allocate_object(size_t raw_size) {
         } 
 }
 
-
-static inline header * allocate_object_old(size_t raw_size) { 
-  /* An allocation of 0 bytes should return the NULL pointer for determinism */
-
-  if (raw_size == 0) {
-    return NULL;
-  }
-
-   /*
-   * Calculate the actual size needed 
-   */
-
-  size_t rounded_size = (raw_size + 7) & ~7;
-  size_t actual_size = ALLOC_HEADER_SIZE + rounded_size;
-  actual_size = actual_size > sizeof(header) ? actual_size : sizeof(header);
-
-  /*
-   * Find the appropriate free list to look for a block to allocate 
-   * (recall that the block size per each list is based on the rounded 
-   * request size, not including the metadata) size of the head
-   */
-
-  for (int i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
-      /* Skip empty lists */
-
-      header* free_list = &freelistSentinels[i];
-
-      if (free_list->next == free_list && free_list->prev == free_list) {
-        continue;
-      }
-
-      /* Check if we have reached the last one */
-      if (i == N_LISTS - 1) {
-        header* current = free_list;
-        while (get_size(current) < actual_size) {
-          current = current->next;
-        }
-        /* Once found we must allocate the block */
-        
-        /* If the block is exactly the request size or
-         * greater than but the remaining portion cannot be allocated
-         * the block is simply removed from the free list.
-         */
-
-        if (get_size(current) == actual_size || ((get_size(current) > actual_size) && (get_size(current) - actual_size <= ALLOC_HEADER_SIZE)))  {
-          /* Set state to allocated */
-          set_state(current, ALLOCATED);
-          remove_block(current);
-          return (header *)((char *) current + ALLOC_HEADER_SIZE);
-        } else {
-          /* We need to split the block, allocate the right side */
-          size_t remainder = get_size(current) - actual_size; 
-          /* Create header at the allocation location */
-          header * split = get_header_from_offset(current, (ptrdiff_t)remainder);
-
-          set_size(split, actual_size);
-
-          set_state(split, ALLOCATED);
-          /* set the left of the alloc block */
-          split->left_size = remainder;
-
-          header *right = get_right_header(split);
-
-          right->left_size = get_size(split);
-          
-
-          /* We must update the size of the remainder now */
-          set_size(current, remainder);
-          /*
-           * When splitting a block, if the size of the remaining block is no longer appropriate for the current list, 
-           * the remainder block should be removed and inserted into the appropriate free list.
-           */
-         
-          /* Check if we need to move the remainder or not */
-          if ((get_size(current) - ALLOC_HEADER_SIZE / 8) - 1 < N_LISTS - 1) {
-            /* Remove the node */
-            current->prev->next = current->next;
-            current->next->prev = current->prev;
-            /* Create new sentinal */
-            header * new_sentinal = &freelistSentinels[((get_size(current) - ALLOC_HEADER_SIZE) / 8) - 1];
-
-            /* Prepend */
-            header *next = new_sentinal->next; 
-            new_sentinal->next = current;
-            current->next = next;
-            current->prev = new_sentinal;
-            next->prev = current;
-          } 
-                    
-          return (header *)((char *) split + ALLOC_HEADER_SIZE);
-        } 
-      }
-  }
-
-}
 
 /*
  * Find index given total size
