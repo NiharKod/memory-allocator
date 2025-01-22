@@ -245,7 +245,7 @@ static inline header *allocate_object(size_t raw_size) {
           /* The last block is unallocated */
          size_t old_index = get_index_from_actual_size(get_size(last_block));
          set_size(last_block, get_size(last_block) + 2 * get_size(lastFencePost) + ARENA_SIZE);
-         get_right_header(new_chunk)->left = get_size(last_block);
+         get_right_header(new_chunk)->left_size = get_size(last_block);
 
          if (get_index_from_actual_size(get_size(last_block)) != old_index) {
            remove_block(last_block);
