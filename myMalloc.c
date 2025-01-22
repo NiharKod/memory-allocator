@@ -449,7 +449,7 @@ static inline void deallocate_object(void * p) {
   
   } else if (get_state(left_block) == UNALLOCATED) {
     size_t new_size = get_size(left_block) + actual_size;
-
+    set_state(block, UNALLOCATED);
     set_size(left_block, new_size);
     right_block->left_size = new_size;
     size_t index_new = get_index_from_actual_size(new_size);
