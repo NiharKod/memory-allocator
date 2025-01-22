@@ -335,7 +335,7 @@ static inline void remove_block(header * header_block) {
 static inline header* search_block(size_t index, size_t actual_size) {
   if (index >= N_LISTS - 1) {
      header* current = &freelistSentinels[index];
-       while (get_size(current) < actual_size) {
+       while (get_size(current) < actual_size || current != NULL) {
          current = current->next;
        }
        /* Returns current once found */
@@ -350,7 +350,7 @@ static inline header* find_block(size_t actual_size) {
   /* Start from the index we predict and cycle through till we have non empty list */
   for (size_t i = get_index_from_actual_size(actual_size); i <= N_LISTS - 1; i++) {
     header *block = search_block(i, actual_size);
-    if (block != block->next){
+    if (block == NULL || block != block->next){
       return block;
     }
   } 
