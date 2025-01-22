@@ -239,7 +239,7 @@ static inline header *allocate_object(size_t raw_size) {
           get_right_header(new_chunk)->left_size = get_size(bigger_new_chunk);
 
           /* Move into last free list */
-          prepend_block(bigger_new_chunk, N_LISTS - 1);
+          prepend_block(N_LISTS - 1, bigger_new_chunk);
           lastFencePost = get_right_header(new_chunk);
         } else {
           /* The last block is unallocated */
