@@ -235,7 +235,7 @@ static inline header *allocate_object(size_t raw_size) {
         if (get_state(last_block) == ALLOCATED) {
           header *bigger_new_chunk = lastFencePost;
           set_state(bigger_new_chunk, UNALLOCATED);
-          set_size(bigger_new_chunk, 2 * get_size(bigger_new_chunk) + ARENA_SIZE);
+          set_size(bigger_new_chunk, 2 * get_size(bigger_new_chunk) + get_size(new_chunk);
           get_right_header(new_chunk)->left_size = get_size(bigger_new_chunk);
 
           /* Move into last free list */
@@ -244,7 +244,7 @@ static inline header *allocate_object(size_t raw_size) {
         } else {
           /* The last block is unallocated */
          size_t old_index = get_index_from_actual_size(get_size(last_block));
-         set_size(last_block, get_size(last_block) + 2 * get_size(lastFencePost) + ARENA_SIZE);
+         set_size(last_block, get_size(last_block) + 2 * get_size(lastFencePost) + get_size(new_chunk));
          get_right_header(new_chunk)->left_size = get_size(last_block);
 
          if (get_index_from_actual_size(get_size(last_block)) != old_index) {
