@@ -223,6 +223,43 @@ static inline header *allocate_object(size_t raw_size) {
 
    header* block = find_block(actual_size);
 
+   while (block == NULL) {
+     header * new_chunk = allocate_chunk(ARENA_SIZE);
+     header * left_fencePost = get_left_header(new_chunk);
+
+     if (get_left_header(left_fencePost) == lastFencePost) {
+        /* If the last block is allocated we just delete the last fenceposts
+         * and make a new header adding new chunk to a free list 
+         */
+        header *last_block = get_left_header(lastFencePost);
+        if (get_state(last_block) == ALLOCATED) {
+          header *bigger_new_chunk = lastFencePost;
+          set_state(bigger_new_chunk, UNALLOCATED);
+          set_size(bigger_new_chunk, 2 * get_size(bigger_new_chunk) + ARENA_SIZE);
+          get_right_header(new_chunk)->left_size = get_size(bigger_new_chunk);
+
+          /* Move into last free list */
+          prepend_block(bigger_new_chunk, N_LISTS - 1);
+          lastFencePost = get_right_header(new_chunk);
+        } else {
+          /* The last block is unallocated */
+         size_t old_index = get_index_from_actual_size(get_size(last_block));
+         set_size(last_block, get_size(last_block) + 2 * get_size(lastFencePost) + ARENA_SIZE);
+         get_right_header(new_chunk)->left = get_size(last_block);
+
+         if (get_index_from_actual_size(get_size(last_block)) != old_index) {
+           remove_block(last_block);
+           prepend_block(get_index_from_actual_size(get_size(last_block)), last_block);
+         }
+        }
+     } else {
+        insert_os_chunk(left_fencePost);
+        prepend_block(N_LISTS - 1, new_chunk);
+
+     }
+      block = find_block(actual_size);
+   }
+
    /* Case: Don't need to split and just return block directly */
     if (get_size(block) == actual_size || ((get_size(block) > actual_size) && (get_size(block) - actual_size <= ALLOC_HEADER_SIZE)))  {
        /* Set state to allocated */
