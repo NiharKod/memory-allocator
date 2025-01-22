@@ -255,7 +255,7 @@ static inline header *allocate_object(size_t raw_size) {
      } else {
         insert_os_chunk(left_fencePost);
         prepend_block(N_LISTS - 1, new_chunk);
-
+        lastFencePost = get_right_header(new_chunk);
      }
 
       block = find_block(actual_size);
