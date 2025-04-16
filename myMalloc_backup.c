@@ -1,3 +1,4 @@
+/* (C) Nihar Kodkani */
 #include <errno.h>
 #include <pthread.h>
 #include <stddef.h>

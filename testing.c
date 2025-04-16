@@ -1,3 +1,4 @@
+/* (C) Nihar Kodkani */
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
